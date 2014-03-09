@@ -1,0 +1,38 @@
+<div dir="ltr" style="text-align: left;" trbidi="on">
+<div style="background-color: white; line-height: 16px; padding: 1em 0px 0px;">
+<span style="background-color: transparent; font-family: Arial, Helvetica, sans-serif; font-size: large;"><b>Basics</b></span><br />
+<div style="font-size: small;">
+<span style="background-color: transparent; font-family: Arial, Helvetica, sans-serif;"><br /></span></div>
+<div>
+<span style="background-color: transparent; font-family: Arial, Helvetica, sans-serif;">Routing handles mapping URLs to the appropriate part of your application. For example, you may want '/toys' route to be handled by your ToysController and '/friends' route to be handled by your FriendsController.&nbsp;</span></div>
+</div>
+<div style="background-color: white; line-height: 16px; padding: 1em 0px 0px;">
+<span style="background-color: transparent; font-family: Arial, Helvetica, sans-serif;">Routes in Angular.js are configured with $routeProvider as in the example below. The $routeProvider allows you to connect a controller, view template, and URL.</span><br />
+<span style="font-family: Arial, Helvetica, sans-serif;"><span style="background-color: transparent;"><br /></span>
+<span style="background-color: transparent;">The example below adapted from the Angular docs shows a Route '/Book/:bookId/ that maps to the controller named BookCntl and the template book.html</span></span></div>
+<div style="background-color: white; padding: 1em 0px 0px;">
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<span style="font-family: Arial, Helvetica, sans-serif;"><iframe frameborder="0" src="http://embed.plnkr.co/9UI1gA0TD5SfQKaWaWH8/script.js" style="height: 250px; width: 100%;"></iframe>
+<span style="background-color: transparent; line-height: 16px;"><br />After pressing the play icon, clicking the 'Moby' link displays various internal Angular objects on the page including the location path and route params.</span></span><br />
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<span style="font-family: Arial, Helvetica, sans-serif;">The $routeProvider when method takes a string for the URL to match and object that tells Angular how to deal serve this route with a controller and associated template.</span><br />
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<span style="font-family: Arial, Helvetica, sans-serif; font-size: large;"><b>HTML5Mode</b></span></div>
+<div>
+<span style="font-family: Arial, Helvetica, sans-serif;">The $locationProvider.html5Mode setting is enabled which means that modern browsers will not show #! in the address bar. The alternative, hashbang mode is the default meaning #! will appear in all URLs. In HTML5 mode, the HTML5 History API is used by the $location service to interact with the browser URL address. With HTML5 mode enabled, you'll need to ensure that all requests to your base URL return the bootstrapping html page (typically index.html). This change will need to be made on your server.</span><br />
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<b><span style="font-family: Arial, Helvetica, sans-serif; font-size: large;">Wildcards</span></b><br />
+<span style="font-family: Arial, Helvetica, sans-serif;">* can be utilized in the path parameter to eagerly capture named fragments of the route. In the example, below, we have set up a route called&nbsp;</span><span style="font-family: Arial, Helvetica, sans-serif;">'/Book/:bookTitle*/:pageNum' and a link 'Book1' that resolves to&nbsp;</span><span style="font-family: Arial, Helvetica, sans-serif;">Book/Long/Title/Here/56. Clicking on the link, sets up the $routeParams object to contain bookTitle =&gt; Long/Title/Here and pageNum =&gt; 56. Optional named paramters can be specified by using ? such as (:footnote?)</span><br />
+<iframe frameborder="0" src="http://embed.plnkr.co/5AoHyX01bs642UcDnLAd/preview" style="height: 250px; width: 100%;"></iframe>
+
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<b><span style="font-family: Arial, Helvetica, sans-serif; font-size: large;">Resolve</span></b><br />
+<span style="font-family: Arial, Helvetica, sans-serif;">The $routeProvider accepts a resolve object that can be used to load data and resolve promises before the route is resolved. The example below allows for an 'authors' service to be injected into the controller. This is a simple example that utilizes $timeout and $q to pretend to return the authors after a two second delay.&nbsp;</span><br />
+<iframe frameborder="0" src="http://embed.plnkr.co/5AoHyX01bs642UcDnLAd/preview" style="height: 250px; width: 100%;"></iframe>
+<br />
+<span style="font-family: Arial, Helvetica, sans-serif;"><br /></span>
+<span style="font-family: Arial, Helvetica, sans-serif; font-size: large;"><b>Docs</b></span><br />
+<span style="font-family: Arial, Helvetica, sans-serif;">The <a href="http://docs.angularjs.org/api/ngRoute.$routeProvider">$routeProvider documentation</a> and <a href="http://docs.angularjs.org/tutorial/step_07">example tutorial </a>cover more details behind the API and its usage.&nbsp;</span><br />
+<br /></div>
+</div>
+
