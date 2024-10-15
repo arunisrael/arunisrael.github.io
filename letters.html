@@ -271,10 +271,11 @@
         function startGame() {
             updateTiles();
             showInstructions();
-            updateIncorrectGuesses(); // Add this line
+            updateIncorrectGuesses();
             setTimeout(() => {
                 document.addEventListener('keydown', handleKeyPress);
-            }, 6000); // Allow input after 6 seconds (1 second after instructions fade out)
+                document.body.focus(); // Focus on the body element
+            }, 2100); // Set timeout to 2100ms (100ms after instructions fade out)
         }
 
         function handleKeyPress(event) {
