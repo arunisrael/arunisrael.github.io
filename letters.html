@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Word</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        #instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            max-width: 80%;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+        .tile-container {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 10px;
+            overflow-x: auto;
+            max-width: 100%;
+            padding: 10px;
+        }
+        .tile {
+            flex: 0 0 auto;
+            width: 50px;
+            height: 50px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            user-select: none;
+        }
+        @keyframes celebrateAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .celebrate {
+            animation: celebrateAnimation 0.5s ease-in-out 3;
+        }
+        .incorrect {
+            animation: shakeAnimation 0.5s ease-in-out;
+        }
+        @keyframes shakeAnimation {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background-color: #6495ED;
+            opacity: 0.7;
+        }
+        /* Add firework styles */
+        .firework {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .incorrect-guesses {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .incorrect-mark {
+            color: red;
+            font-size: 24px;
+            margin: 0 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="instructions">
+        Guess the word. You have 3 incorrect guesses.
+    </div>
+    <div class="tile-container" id="tileContainer"></div>
+    <div class="incorrect-guesses" id="incorrectGuesses"></div>
+    <div id="rainContainer" class="rain"></div>
+    <div id="fireworksContainer"></div>
+    <script>
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const tileContainer = document.getElementById('tileContainer');
+        const commonWords = [
+            'because', 'through', 'between', 'without', 'believe', 'another', 'against', 'country', 'problem', 'company',
+            'general', 'program', 'question', 'government', 'important', 'different', 'national', 'possible', 'together', 'something',
+            'provide', 'service', 'consider', 'according', 'decision', 'increase', 'present', 'probably', 'business', 'information',
+            'understand', 'however', 'available', 'practice', 'evidence', 'actually', 'remember', 'experience', 'personal', 'although',
+            'position', 'political', 'particular', 'situation', 'necessary', 'complete', 'probably', 'economic', 'continue', 'financial',
+            'society', 'control', 'develop', 'research', 'interest', 'community', 'perhaps', 'include', 'president', 'receive',
+            'response', 'technology', 'computer', 'science', 'education', 'national', 'planning', 'university', 'management', 'activity',
+            'purpose', 'physical', 'training', 'anything', 'building', 'military', 'morning', 'standard', 'difficult', 'pressure',
+            'knowledge', 'cultural', 'especially', 'official', 'treatment', 'violence', 'language', 'discover', 'strategy', 'thousand',
+            'analysis', 'direction', 'quality', 'medical', 'training', 'process', 'outside', 'current', 'positive', 'security'
+        ];
+
+        let hiddenWord = commonWords[Math.floor(Math.random() * commonWords.length)];
+        console.log(hiddenWord);
+        let revealedLetters = new Array(hiddenWord.length).fill(false);
+        let revealedCount = 0;
+        let incorrectGuesses = 0;
+        const maxIncorrectGuesses = 3;
+
+        function updateTiles() {
+            tileContainer.innerHTML = '';            
+            for (let i = 0; i < hiddenWord.length; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                tile.textContent = revealedLetters[i] ? hiddenWord[i].toUpperCase() : '';
+                tile.dataset.index = i;
+                tile.style.backgroundColor = '#e0e0e0';
+                tileContainer.appendChild(tile);
+            }
+            updateIncorrectGuesses(); // Add this line
+        }
+
+        function revealLetter(pressedKey) {
+            const upperPressedKey = pressedKey.toUpperCase();
+            let revealed = false;
+            for (let i = 0; i < hiddenWord.length; i++) {
+                if (hiddenWord[i].toUpperCase() === upperPressedKey && !revealedLetters[i]) {
+                    revealedLetters[i] = true;
+                    revealedCount++;
+                    revealed = true;
+                }
+            }
+            if (revealed) {
+                updateTiles();
+            } else {
+                incorrectGuesses++;
+                animateIncorrectGuess();
+                updateIncorrectGuesses(); // Add this line
+                if (incorrectGuesses >= maxIncorrectGuesses) {
+                    revealFullWord();
+                }
+            }
+            checkGameEnd();
+        }
+
+        function animateIncorrectGuess() {
+            tileContainer.classList.add('incorrect');
+            setTimeout(() => {
+                tileContainer.classList.remove('incorrect');
+            }, 500);
+        }
+
+        function revealFullWord() {
+            revealedLetters.fill(true);
+            revealedCount = hiddenWord.length;
+            updateTiles();
+        }
+
+        function checkGameEnd() {
+            if (revealedCount === hiddenWord.length) {
+                if (incorrectGuesses < maxIncorrectGuesses) {
+                    console.log('Congratulations! You revealed the whole word!');
+                    // Remove celebrate class and start fireworks
+                    createFireworks();
+                } else {
+                    console.log('Game over! The word was revealed.');
+                    startRainAnimation();
+                }
+            }
+        }
+
+        function startRainAnimation() {
+            const rainContainer = document.getElementById('rainContainer');
+            for (let i = 0; i < 100; i++) {
+                createRaindrop(rainContainer);
+            }
+        }
+
+        function createRaindrop(container) {
+            const raindrop = document.createElement('div');
+            raindrop.className = 'raindrop';
+            raindrop.style.left = `${Math.random() * 100}%`;
+            raindrop.style.animationDuration = `${Math.random() * 1 + 0.5}s`;
+            raindrop.style.animationDelay = `${Math.random() * 2}s`;
+            container.appendChild(raindrop);
+
+            raindrop.animate([
+                { transform: 'translateY(-100vh)' },
+                { transform: 'translateY(100vh)' }
+            ], {
+                duration: Math.random() * 1000 + 1000,
+                iterations: Infinity
+            });
+        }
+
+        function createFireworks() {
+            const fireworksContainer = document.getElementById('fireworksContainer');
+            for (let i = 0; i < 100; i++) {  // Increased from 20 to 50
+                setTimeout(() => {
+                    createFireworkBurst(fireworksContainer);
+                }, i * 200);  // Decreased delay from 300ms to 200ms
+            }
+        }
+
+        function createFireworkBurst(container) {
+            const burstX = Math.random() * 100;
+            const burstY = Math.random() * 100;
+            for (let i = 0; i < 30; i++) {  // Increased from 15 to 30
+                createFirework(container, burstX, burstY);
+            }
+        }
+
+        function createFirework(container, x, y) {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${x}%`;
+            firework.style.top = `${y}%`;
+            firework.style.backgroundColor = getRandomColor();
+            container.appendChild(firework);
+
+            animateFirework(firework);
+        }
+
+        function animateFirework(firework) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = Math.random() * 100 + 50;  // Increased distance
+            const duration = Math.random() * 1000 + 1000;  // Increased duration
+
+            const animation = firework.animate([
+                { transform: 'scale(1) translate(0, 0)', opacity: 1 },
+                { transform: `scale(0) translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`, opacity: 0 }
+            ], {
+                duration: duration,
+                easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)'  // Changed easing function
+            });
+
+            animation.onfinish = () => firework.remove();
+        }
+
+        function getRandomColor() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function showInstructions() {
+            const instructions = document.getElementById('instructions');
+            instructions.style.opacity = '1';
+            setTimeout(() => {
+                instructions.style.opacity = '0';
+            }, 2000); // Fade out after 5 seconds
+        }
+
+        function startGame() {
+            updateTiles();
+            showInstructions();
+            updateIncorrectGuesses(); // Add this line
+            setTimeout(() => {
+                document.addEventListener('keydown', handleKeyPress);
+            }, 6000); // Allow input after 6 seconds (1 second after instructions fade out)
+        }
+
+        function handleKeyPress(event) {
+            if (event.key.length === 1 && event.key.match(/[a-z]/i)) {
+                revealLetter(event.key);
+            }
+        }
+
+        function updateIncorrectGuesses() {
+            const incorrectGuessesContainer = document.getElementById('incorrectGuesses');
+            incorrectGuessesContainer.innerHTML = '';
+            for (let i = 0; i < maxIncorrectGuesses; i++) {
+                const mark = document.createElement('span');
+                mark.className = 'incorrect-mark';
+                mark.textContent = i < incorrectGuesses ? '✘' : '○';
+                incorrectGuessesContainer.appendChild(mark);
+            }
+        }
+
+        startGame();
+
+    </script>
+</body>
+</html>
